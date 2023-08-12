@@ -309,6 +309,8 @@ num_testing_points = 2000
 # test_dataset = AccelerometerDataset(test_raw_data,test_labels)
 # #     return train_dataset, test_dataset
 
+import matplotlib.pyplot as plt
+training_data_sizes = np.arange(0.1, 1.1, 0.3)  # Experiment with different training data sizes
 #COMMENTED
 # train_raw_data, train_labels = chooseData(train_data, num_training_points)
 # test_raw_data, test_labels = chooseData(test_data, num_testing_points)
@@ -605,15 +607,37 @@ def run(train_data, num_training_points):
         print(f"Test Recall: {recall:.4f}")
         return accuracy, recall
 
-accuracy_sum = 0
-recall_sum = 0
-for i in range(3):
-    print("Test Run - " + str(i+1))
-    acc, recall = run(train_data, num_training_points)
-    accuracy_sum+=acc
-    recall_sum+=recall
-print("Average accuracy obtained across the three runs - " + str(accuracy_sum/3))
-print("Average recall obtained across the three runs - " + str(recall_sum/3))
+avg_accuracies=[]
+avg_recalls=[]
+for size in training_data_sizes:
+  num_samples = int(num_training_points * size)
+  print("Training data size : " + str(num_samples))
+  accuracy_sum = 0
+  recall_sum = 0
+  for i in range(3):
+      print("Test Run - " + str(i+1))
+      acc, recall = run(train_data, num_samples)
+      accuracy_sum+=acc
+      recall_sum+=recall
+  avg_accuracy = accuracy_sum/3
+  avg_recall = recall_sum/3
+  avg_accuracies.append(avg_accuracy)
+  avg_recalls.append(avg_recall)
+  print("Average accuracy obtained across the three runs - " + str(avg_accuracy))
+  print("Average recall obtained across the three runs - " + str(avg_recall))
+plt.figure(figsize=(10, 6))
+plt.plot(training_data_sizes, avg_accuracies, label='Accuracy')
+plt.plot(training_data_sizes, avg_recalls, label='Recall')
+plt.xlabel('Training Data Size')
+plt.ylabel('Score')
+plt.title('Effect of Training Data Size on Model Performance')
+plt.legend()
+plt.show()
+#     acc, recall = run(train_data, num_training_points)
+#     accuracy_sum+=acc
+#     recall_sum+=recall
+# print("Average accuracy obtained across the three runs - " + str(accuracy_sum/3))
+# print("Average recall obtained across the three runs - " + str(recall_sum/3))
 
 # def run(train_data, num_training_points):
 #     train_raw_data, train_labels = chooseData(train_data, num_training_points)

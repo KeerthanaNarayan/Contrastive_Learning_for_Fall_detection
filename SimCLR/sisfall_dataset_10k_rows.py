@@ -20,7 +20,7 @@ from torch.utils.data import DataLoader
 
 # Load and preprocess the accelerometer data
 def load_and_preprocess_data():
-    data =pd.read_csv('SisFall_dataset.csv', encoding='latin-1')
+    data =pd.read_csv('SisFall_dataset.csv')
     accelerometer_data = data[["ADXL345_x",	"ADXL345_y",	"ADXL345_z",	"ITG3200_x",	"ITG3200_y",	"ITG3200_z",	"MMA8451Q_x",	"MMA8451Q_y",	"MMA8451Q_z"]].values
 
     # Standardize the data
@@ -88,12 +88,11 @@ class SimCLRModel(nn.Module):
             nn.ReLU(),
             nn.MaxPool1d(kernel_size=2, stride=2),
             nn.Conv1d(64, 128, kernel_size=3, stride=1, padding=1),
-            nn.ReLU()
+            nn.ReLU(),
+            nn.MaxPool1d(kernel_size=2, stride=2)
         )
-        fc_input_size = max((num_steps // 4), 4)
 
-        self.fc = nn.Linear(32*fc_input_size, self.embedding_size)
-#         self.fc = nn.Linear(128 * (num_steps // 4), self.embedding_size)
+        self.fc = nn.Linear(128 * (num_steps // 4), self.embedding_size)
 
 
     def forward(self, x):
@@ -283,6 +282,8 @@ test_data = data_with_labels[split:]
 num_training_points = 8000
 num_testing_points = 2000
 
+import matplotlib.pyplot as plt
+training_data_sizes = np.arange(0.1, 1.1, 0.3)  # Experiment with different training data sizes
 # import random
 
 # # Load the fall-dataset-raw csv files
@@ -608,15 +609,32 @@ def run(train_data, num_training_points):
         print(f"Test Recall: {recall:.4f}")
         return accuracy, recall
 
-accuracy_sum = 0
-recall_sum = 0
-for i in range(3):
-    print("Test Run - " + str(i+1))
-    acc, recall = run(train_data, num_training_points)
-    accuracy_sum+=acc
-    recall_sum+=recall
-print("Average accuracy obtained across the three runs - " + str(accuracy_sum/3))
-print("Average recall obtained across the three runs - " + str(recall_sum/3))
+avg_accuracies=[]
+avg_recalls=[]
+for size in training_data_sizes:
+  num_samples = int(num_training_points * size)
+  print("Training data size : " + str(num_samples))
+  accuracy_sum = 0
+  recall_sum = 0
+  for i in range(3):
+      print("Test Run - " + str(i+1))
+      acc, recall = run(train_data, num_samples)
+      accuracy_sum+=acc
+      recall_sum+=recall
+  avg_accuracy = accuracy_sum/3
+  avg_recall = recall_sum/3
+  avg_accuracies.append(avg_accuracy)
+  avg_recalls.append(avg_recall)
+  print("Average accuracy obtained across the three runs - " + str(avg_accuracy))
+  print("Average recall obtained across the three runs - " + str(avg_recall))
+plt.figure(figsize=(10, 6))
+plt.plot(training_data_sizes, avg_accuracies, label='Accuracy')
+plt.plot(training_data_sizes, avg_recalls, label='Recall')
+plt.xlabel('Training Data Size')
+plt.ylabel('Score')
+plt.title('Effect of Training Data Size on Model Performance')
+plt.legend()
+plt.show()
 
 # # Load the fall-dataset-features csv files
 # feature_files = glob.glob('fall-dataset-features/*.csv')
