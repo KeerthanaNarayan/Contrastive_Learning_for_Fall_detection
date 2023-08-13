@@ -35,6 +35,13 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
+!pip install psutil
+!pip install codecarbon
+import psutil
+from codecarbon import EmissionsTracker
+memory_before=psutil.virtual_memory().used
+emissions_tracker=EmissionsTracker()
+emissions_tracker.start()
 
 # Load and preprocess the accelerometer data
 def load_and_preprocess_data():
@@ -633,6 +640,11 @@ plt.title('Effect of Training Data Size on Model Performance')
 plt.legend()
 plt.show()
 
+memory_after=psutil.virtual_memory().used
+emissions: float = emissions_tracker.stop()
+print("Energy Consumption :",emissions)
+memory_used= (memory_after - memory_before)/(1024*1024)
+print("Total memory used for processing in MB : ",memory_used)z
 # # Load the fall-dataset-features csv files
 # feature_files = glob.glob('fall-dataset-features/*.csv')
 # features = []
