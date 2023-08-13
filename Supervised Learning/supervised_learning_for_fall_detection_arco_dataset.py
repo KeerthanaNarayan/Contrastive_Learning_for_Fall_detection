@@ -27,6 +27,13 @@ def chooseData(org_data, no_of_points):
 import os
 import zipfile
 import pandas as pd
+!pip install psutil
+!pip install codecarbon
+import psutil
+from codecarbon import EmissionsTracker
+memory_before=psutil.virtual_memory().used
+emissions_tracker=EmissionsTracker()
+emissions_tracker.start()
 
 zip_path = 'fall-dataset-raw.zip' #zip_path = 'fall-dataset-all.zip'
 
@@ -318,3 +325,8 @@ plt.ylabel('Score')
 plt.title('Effect of Training Data Size on Model Performance')
 plt.legend()
 plt.show()
+memory_after=psutil.virtual_memory().used
+emissions: float = emissions_tracker.stop()
+print("Energy Consumption :",emissions)
+memory_used= (memory_after - memory_before)/(1024*1024)
+print("Total memory used for processing in MB : ",memory_used)

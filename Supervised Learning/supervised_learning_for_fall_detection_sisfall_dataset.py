@@ -28,6 +28,13 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
+!pip install psutil
+!pip install codecarbon
+import psutil
+from codecarbon import EmissionsTracker
+memory_before=psutil.virtual_memory().used
+emissions_tracker=EmissionsTracker()
+emissions_tracker.start()
 # Load your dataset
 data = pd.read_csv("SisFall_dataset.csv")
 
@@ -312,3 +319,8 @@ plt.ylabel('Score')
 plt.title('Effect of Training Data Size on Model Performance')
 plt.legend()
 plt.show()
+memory_after=psutil.virtual_memory().used
+emissions: float = emissions_tracker.stop()
+print("Energy Consumption :",emissions)
+memory_used= (memory_after - memory_before)/(1024*1024)
+print("Total memory used for processing in MB : ",memory_used)

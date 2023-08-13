@@ -27,7 +27,12 @@ def chooseData(org_data, no_of_points):
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+import psutil
+from codecarbon import EmissionsTracker
 
+memory_before=psutil.virtual_memory().used
+emissions_tracker=EmissionsTracker()
+emissions_tracker.start()
 # Load your dataset
 train_data = pd.read_csv("raw182_Training_Relabeled_Auto_25.csv")
 
@@ -309,3 +314,8 @@ plt.ylabel('Score')
 plt.title('Effect of Training Data Size on Model Performance')
 plt.legend()
 plt.show()
+memory_after=psutil.virtual_memory().used
+emissions: float = emissions_tracker.stop()
+print("Energy Consumption :",emissions)
+memory_used= (memory_after - memory_before)/(1024*1024)
+print("Total memory used for processing in MB : ",memory_used)
