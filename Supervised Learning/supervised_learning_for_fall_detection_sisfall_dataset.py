@@ -9,6 +9,8 @@ Original file is located at
 
 import numpy as np
 import random
+
+# Function to randomly select required number of data points
 def chooseData(org_data, no_of_points):
     # Create a copy of the original data to avoid modifying it
     shuffled_data = org_data.copy()
@@ -17,6 +19,7 @@ def chooseData(org_data, no_of_points):
     np.random.shuffle(shuffled_data)
     shuffled_data = shuffled_data.tolist()
 
+    # Sample required number of points
     reduced_data = random.sample(shuffled_data, no_of_points)
 
     # Split the data and labels
@@ -32,10 +35,15 @@ from sklearn.preprocessing import StandardScaler
 !pip install codecarbon
 import psutil
 from codecarbon import EmissionsTracker
+
+# Get the initial memory usage before loading the dataset
 memory_before=psutil.virtual_memory().used
+
+# Initialize the emissions tracker for tracking carbon emissions
 emissions_tracker=EmissionsTracker()
 emissions_tracker.start()
-# Load your dataset
+
+# Load the dataset
 data = pd.read_csv("SisFall_dataset.csv")
 
 # Separate features and labels
@@ -49,16 +57,10 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-# Load your dataset
-# train_data = pd.read_csv("raw182_Training_Relabeled_Auto_25.csv")
-
-# # Separate features and labels
-# raw_data = data[[" ms_accelerometer_x", " ms_accelerometer_y", " ms_accelerometer_z"]].values
-# labels = data["outcome"]
-
 num_training_points = 8000
 num_testing_points = 2000
 
+# Combine data and labels into a single array for easy shuffling
 data_with_labels = np.column_stack((data_final, labels))
 
 # Split the data into training and testing sets with an 80:20 ratio
@@ -66,62 +68,52 @@ split = int(0.8 * len(data_with_labels))
 train_data = data_with_labels[:split]
 test_data = data_with_labels[split:]
 
-
-
-# from sklearn.ensemble import RandomForestClassifier
-# from sklearn.metrics import accuracy_score
-
-# # Initialize and train the model
-# model = RandomForestClassifier(random_state=42)
-# model.fit(X_train_scaled, y_train_chosen)
-
-# # Make predictions
-# y_pred = model.predict(X_test_scaled)
-
-# # Calculate accuracy
-# accuracy = accuracy_score(y_test_chosen, y_pred)
-# print(f"Accuracy: {accuracy:.2f}")
-
 import matplotlib.pyplot as plt
-training_data_sizes = np.arange(0.1, 1.1, 0.3)  # Experiment with different training data sizes
+
+# Setup for experiment with different training data sizes
+training_data_sizes = np.arange(0.1, 1.1, 0.3)
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, recall_score
 import numpy as np
+
 
 # Initialize the model
 model = RandomForestClassifier(random_state=42)
 
 # Set the number of iterations
 num_iterations = 3
+
 avg_accuracies=[]
 avg_recalls=[]
 
 for size in training_data_sizes:
+  #Choose appropriate training data size
   num_samples = int(num_training_points * size)
   print("Training data size : " + str(num_samples))
   accuracies = []
   recalls = []
   for iteration in range(num_iterations):
-    #Choose different data for training and testing in every iteration
+      #Choose different data for training and testing in every iteration
       X_train_chosen, y_train_chosen = chooseData(train_data, num_training_points)
       X_test_chosen, y_test_chosen = chooseData(test_data, num_testing_points)
 
-    # Standardize features
+      # Standardize features
       scaler = StandardScaler()
       X_train_scaled = scaler.fit_transform(X_train_chosen)
       X_test_scaled = scaler.transform(X_test_chosen)
 
-    # Initialize and train the model
+      # Initialize and train the model
       model.fit(X_train_scaled, y_train_chosen)
 
-    # Make predictions
+      # Make predictions
       y_pred = model.predict(X_test_scaled)
 
-    # Calculate accuracy
+      # Calculate accuracy
       accuracy = accuracy_score(y_test_chosen, y_pred)
       accuracies.append(accuracy)
 
-    # Calculate recall
+      # Calculate recall
       recall = recall_score(y_test_chosen, y_pred)
       recalls.append(recall)
 
@@ -135,6 +127,7 @@ for size in training_data_sizes:
   avg_accuracies.append(average_accuracy)
   avg_recalls.append(average_recall)
 
+# Plot results
 plt.figure(figsize=(10, 6))
 plt.plot(training_data_sizes, avg_accuracies, label='Accuracy')
 plt.plot(training_data_sizes, avg_recalls, label='Recall')
@@ -143,44 +136,48 @@ plt.ylabel('Score')
 plt.title('Effect of Training Data Size on Model Performance')
 plt.legend()
 plt.show()
+
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, recall_score
 import numpy as np
+
 
 # Initialize the logistic regression model
 logreg_model = LogisticRegression(random_state=42)
 
 # Set the number of iterations
 num_iterations = 3
+
 avg_accuracies=[]
 avg_recalls=[]
 
 for size in training_data_sizes:
+  #Choose appropriate training data size
   num_samples = int(num_training_points * size)
   print("Training data size : " + str(num_samples))
   accuracies = []
   recalls = []
   for iteration in range(num_iterations):
-    #Choose different data for training and testing in every iteration
+      #Choose different data for training and testing in every iteration
       X_train_chosen, y_train_chosen = chooseData(train_data, num_training_points)
       X_test_chosen, y_test_chosen = chooseData(test_data, num_testing_points)
 
-    # Standardize features
+      # Standardize features
       scaler = StandardScaler()
       X_train_scaled = scaler.fit_transform(X_train_chosen)
       X_test_scaled = scaler.transform(X_test_chosen)
 
-    # train the model
+      # train the model
       logreg_model.fit(X_train_scaled, y_train_chosen)
 
-    # Make predictions
+      # Make predictions
       y_pred = logreg_model.predict(X_test_scaled)
 
-    # Calculate accuracy
+      # Calculate accuracy
       accuracy = accuracy_score(y_test_chosen, y_pred)
       accuracies.append(accuracy)
 
-    # Calculate recall
+      # Calculate recall
       recall = recall_score(y_test_chosen, y_pred)
       recalls.append(recall)
 
@@ -194,6 +191,7 @@ for size in training_data_sizes:
   avg_accuracies.append(average_accuracy)
   avg_recalls.append(average_recall)
 
+# Plot results
 plt.figure(figsize=(10, 6))
 plt.plot(training_data_sizes, avg_accuracies, label='Accuracy')
 plt.plot(training_data_sizes, avg_recalls, label='Recall')
@@ -202,8 +200,11 @@ plt.ylabel('Score')
 plt.title('Effect of Training Data Size on Model Performance')
 plt.legend()
 plt.show()
+
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score, recall_score
+
+
 
 # Initialize and train the KNN model
 k = 5  # Number of neighbors
@@ -211,35 +212,37 @@ knn_model = KNeighborsClassifier(n_neighbors=k)
 
 # Set the number of iterations
 num_iterations = 3
+
 avg_accuracies=[]
 avg_recalls=[]
 
 for size in training_data_sizes:
+  #Choose appropriate training data size
   num_samples = int(num_training_points * size)
   print("Training data size : " + str(num_samples))
   accuracies = []
   recalls = []
   for iteration in range(num_iterations):
-    #Choose different data for training and testing in every iteration
+      #Choose different data for training and testing in every iteration
       X_train_chosen, y_train_chosen = chooseData(train_data, num_training_points)
       X_test_chosen, y_test_chosen = chooseData(test_data, num_testing_points)
 
-    # Standardize features
+      # Standardize features
       scaler = StandardScaler()
       X_train_scaled = scaler.fit_transform(X_train_chosen)
       X_test_scaled = scaler.transform(X_test_chosen)
 
-    # train the model
+      # train the model
       knn_model.fit(X_train_scaled, y_train_chosen)
 
-    # Make predictions
+      # Make predictions
       y_pred = knn_model.predict(X_test_scaled)
 
-    # Calculate accuracy
+      # Calculate accuracy
       accuracy = accuracy_score(y_test_chosen, y_pred)
       accuracies.append(accuracy)
 
-    # Calculate recall
+      # Calculate recall
       recall = recall_score(y_test_chosen, y_pred)
       recalls.append(recall)
 
@@ -253,6 +256,7 @@ for size in training_data_sizes:
   avg_accuracies.append(average_accuracy)
   avg_recalls.append(average_recall)
 
+# Plot results
 plt.figure(figsize=(10, 6))
 plt.plot(training_data_sizes, avg_accuracies, label='Accuracy')
 plt.plot(training_data_sizes, avg_recalls, label='Recall')
@@ -261,43 +265,47 @@ plt.ylabel('Score')
 plt.title('Effect of Training Data Size on Model Performance')
 plt.legend()
 plt.show()
+
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import accuracy_score, recall_score
+
 
 # Initialize and train the Naive Bayes model
 nb_model = GaussianNB()
 
 # Set the number of iterations
 num_iterations = 3
+
 avg_accuracies=[]
 avg_recalls=[]
 
 for size in training_data_sizes:
+  #Choose appropriate training data size
   num_samples = int(num_training_points * size)
   print("Training data size : " + str(num_samples))
   accuracies = []
   recalls = []
   for iteration in range(num_iterations):
-    #Choose different data for training and testing in every iteration
+      #Choose different data for training and testing in every iteration
       X_train_chosen, y_train_chosen = chooseData(train_data, num_training_points)
       X_test_chosen, y_test_chosen = chooseData(test_data, num_testing_points)
 
-    # Standardize features
+      # Standardize features
       scaler = StandardScaler()
       X_train_scaled = scaler.fit_transform(X_train_chosen)
       X_test_scaled = scaler.transform(X_test_chosen)
 
-    # train the model
+      # train the model
       nb_model.fit(X_train_scaled, y_train_chosen)
 
-    # Make predictions
+      # Make predictions
       y_pred = nb_model.predict(X_test_scaled)
 
-    # Calculate accuracy
+      # Calculate accuracy
       accuracy = accuracy_score(y_test_chosen, y_pred)
       accuracies.append(accuracy)
 
-    # Calculate recall
+      # Calculate recall
       recall = recall_score(y_test_chosen, y_pred)
       recalls.append(recall)
 
@@ -311,6 +319,7 @@ for size in training_data_sizes:
   avg_accuracies.append(average_accuracy)
   avg_recalls.append(average_recall)
 
+# Plot results
 plt.figure(figsize=(10, 6))
 plt.plot(training_data_sizes, avg_accuracies, label='Accuracy')
 plt.plot(training_data_sizes, avg_recalls, label='Recall')
@@ -319,8 +328,14 @@ plt.ylabel('Score')
 plt.title('Effect of Training Data Size on Model Performance')
 plt.legend()
 plt.show()
+
+# Measure final memory usage
 memory_after=psutil.virtual_memory().used
+
+# Calculate energy consumption
 emissions: float = emissions_tracker.stop()
 print("Energy Consumption :",emissions)
+
+# Calculate memory used in MB
 memory_used= (memory_after - memory_before)/(1024*1024)
 print("Total memory used for processing in MB : ",memory_used)
