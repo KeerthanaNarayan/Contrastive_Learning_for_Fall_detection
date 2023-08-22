@@ -43,7 +43,7 @@ emissions_tracker=EmissionsTracker()
 emissions_tracker.start()
 
 # Load dataset
-zip_path = 'fall-dataset-raw.zip' 
+zip_path = 'fall-dataset-raw.zip'
 
 # Extract the CSV files from the zip file
 with zipfile.ZipFile(zip_path, 'r') as zip_ref:
@@ -56,34 +56,6 @@ data = pd.concat([pd.read_csv(file, encoding='latin-1') for file in csv_files], 
 # Separate features and labels
 accelerometer_data = data[["Acc(X)", "Acc(Y)", "Acc(Z)", "Rot(X)", "Rot(Y)", "Rot(Z)", "Pitch", "Roll", "Yaw"]].values
 labels = list(data["Fall"])
-
-# import os
-# import zipfile
-# import pandas as pd
-# !pip install psutil
-# !pip install codecarbon
-# import psutil
-# from codecarbon import EmissionsTracker
-
-# memory_before=psutil.virtual_memory().used
-# emissions_tracker=EmissionsTracker()
-
-# emissions_tracker.start()
-
-# zip_path = 'fall-dataset-raw.zip' #zip_path = 'fall-dataset-all.zip'
-
-# # Extract the CSV files from the zip file
-# with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-#     csv_files = [file for file in zip_ref.namelist() if file.endswith('.csv')]
-#     zip_ref.extractall(members=csv_files)
-
-# # Read and concatenate the extracted CSV files into a DataFrame
-# data = pd.concat([pd.read_csv(file, encoding='latin-1') for file in csv_files], ignore_index=True)
-# accelerometer_data = data[["Acc(X)", "Acc(Y)", "Acc(Z)", "Rot(X)", "Rot(Y)", "Rot(Z)", "Pitch", "Roll", "Yaw", "Timestamp"]].values
-# labels = list(data["Fall"])#.values
-# # # Standardize the data
-# # scaler = StandardScaler()
-# # standardized_data = scaler.fit_transform(accelerometer_data)
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -119,8 +91,8 @@ model = RandomForestClassifier(random_state=42)
 # Set the number of iterations
 num_iterations = 3
 
-avg_accuracies=[]
-avg_recalls=[]
+avg_accuracies_rf=[]
+avg_recalls_rf=[]
 
 for size in training_data_sizes:
   #Choose appropriate training data size
@@ -159,13 +131,13 @@ for size in training_data_sizes:
 
   print(f"Average Accuracy across {num_iterations} iterations: {average_accuracy:.2f}")
   print(f"Average Recall across {num_iterations} iterations: {average_recall:.2f}")
-  avg_accuracies.append(average_accuracy)
-  avg_recalls.append(average_recall)
+  avg_accuracies_rf.append(average_accuracy)
+  avg_recalls_rf.append(average_recall)
 
 # Plot results
 plt.figure(figsize=(10, 6))
-plt.plot(training_data_sizes, avg_accuracies, label='Accuracy')
-plt.plot(training_data_sizes, avg_recalls, label='Recall')
+plt.plot(training_data_sizes, avg_accuracies_rf, label='Accuracy')
+plt.plot(training_data_sizes, avg_recalls_rf, label='Recall')
 plt.xlabel('Training Data Size')
 plt.ylabel('Score')
 plt.title('Effect of Training Data Size on Model Performance')
@@ -183,8 +155,8 @@ logreg_model = LogisticRegression(random_state=42)
 # Set the number of iterations
 num_iterations = 3
 
-avg_accuracies=[]
-avg_recalls=[]
+avg_accuracies_lr=[]
+avg_recalls_lr=[]
 
 for size in training_data_sizes:
   #Choose appropriate training data size
@@ -223,13 +195,13 @@ for size in training_data_sizes:
 
   print(f"Average Accuracy across {num_iterations} iterations: {average_accuracy:.2f}")
   print(f"Average Recall across {num_iterations} iterations: {average_recall:.2f}")
-  avg_accuracies.append(average_accuracy)
-  avg_recalls.append(average_recall)
+  avg_accuracies_lr.append(average_accuracy)
+  avg_recalls_lr.append(average_recall)
 
 # Plot results
 plt.figure(figsize=(10, 6))
-plt.plot(training_data_sizes, avg_accuracies, label='Accuracy')
-plt.plot(training_data_sizes, avg_recalls, label='Recall')
+plt.plot(training_data_sizes, avg_accuracies_lr, label='Accuracy')
+plt.plot(training_data_sizes, avg_recalls_lr, label='Recall')
 plt.xlabel('Training Data Size')
 plt.ylabel('Score')
 plt.title('Effect of Training Data Size on Model Performance')
@@ -248,8 +220,8 @@ knn_model = KNeighborsClassifier(n_neighbors=k)
 # Set the number of iterations
 num_iterations = 3
 
-avg_accuracies=[]
-avg_recalls=[]
+avg_accuracies_knn=[]
+avg_recalls_knn=[]
 
 for size in training_data_sizes:
   #Choose appropriate training data size
@@ -288,13 +260,13 @@ for size in training_data_sizes:
 
   print(f"Average Accuracy across {num_iterations} iterations: {average_accuracy:.2f}")
   print(f"Average Recall across {num_iterations} iterations: {average_recall:.2f}")
-  avg_accuracies.append(average_accuracy)
-  avg_recalls.append(average_recall)
+  avg_accuracies_knn.append(average_accuracy)
+  avg_recalls_knn.append(average_recall)
 
 # Plot results
 plt.figure(figsize=(10, 6))
-plt.plot(training_data_sizes, avg_accuracies, label='Accuracy')
-plt.plot(training_data_sizes, avg_recalls, label='Recall')
+plt.plot(training_data_sizes, avg_accuracies_knn, label='Accuracy')
+plt.plot(training_data_sizes, avg_recalls_knn, label='Recall')
 plt.xlabel('Training Data Size')
 plt.ylabel('Score')
 plt.title('Effect of Training Data Size on Model Performance')
@@ -311,8 +283,8 @@ nb_model = GaussianNB()
 # Set the number of iterations
 num_iterations = 3
 
-avg_accuracies=[]
-avg_recalls=[]
+avg_accuracies_nb=[]
+avg_recalls_nb=[]
 
 for size in training_data_sizes:
   #Choose appropriate training data size
@@ -351,13 +323,13 @@ for size in training_data_sizes:
 
   print(f"Average Accuracy across {num_iterations} iterations: {average_accuracy:.2f}")
   print(f"Average Recall across {num_iterations} iterations: {average_recall:.2f}")
-  avg_accuracies.append(average_accuracy)
-  avg_recalls.append(average_recall)
+  avg_accuracies_nb.append(average_accuracy)
+  avg_recalls_nb.append(average_recall)
 
 # Plot results
 plt.figure(figsize=(10, 6))
-plt.plot(training_data_sizes, avg_accuracies, label='Accuracy')
-plt.plot(training_data_sizes, avg_recalls, label='Recall')
+plt.plot(training_data_sizes, avg_accuracies_nb, label='Accuracy')
+plt.plot(training_data_sizes, avg_recalls_nb, label='Recall')
 plt.xlabel('Training Data Size')
 plt.ylabel('Score')
 plt.title('Effect of Training Data Size on Model Performance')
@@ -374,3 +346,49 @@ print("Energy Consumption :",emissions)
 # Calculate memory used in MB
 memory_used= (memory_after - memory_before)/(1024*1024)
 print("Total memory used for processing in MB : ",memory_used)
+
+avg_accuracies_CL=[0.8733333333333332, 0.8785833333333333, 0.8881666666666667, 0]
+avg_recalls_CL=[0.14155829550566393, 0.13419172736950905, 0.2566781463889553, 0]
+
+import matplotlib.pyplot as plt
+
+classifiers = ['Random Forest', 'Logistic Regression', 'KNN', 'Naive Bayes', 'SimCLR based classifier']
+x = list(range(len(training_data_sizes)))
+width = 0.15  # Width of each bar
+training_data_size_labels = ['10% of Data','40% of Data', '70% of Data', 'Complete Data']
+plt.figure(figsize=(10, 6))
+plt.bar(x, avg_accuracies_rf, width=width, label='Random Forest')
+plt.bar([i + width for i in x], avg_accuracies_lr, width=width, label='Logistic Regression')
+plt.bar([i + width * 2 for i in x], avg_accuracies_knn, width=width, label='KNN')
+plt.bar([i + width * 3 for i in x], avg_accuracies_nb, width=width, label='Naive Bayes')
+plt.bar([i + width * 4 for i in x], avg_accuracies_CL, width=width, label='SimCLR based classifier')
+
+plt.xlabel('Classifiers')
+plt.ylabel('Average Accuracy')
+plt.title('Average Accuracies by Classifier and Training Data Size')
+plt.xticks([i + 2 * width for i in x], training_data_size_labels)
+plt.legend(loc ='lower right')
+plt.tight_layout()
+
+# Add grid lines and set background color
+plt.grid(axis='y', linestyle='-', alpha=0.7)
+plt.show()
+
+plt.figure(figsize=(10, 6))
+plt.bar(x, avg_recalls_rf, width=width, label='Random Forest')
+plt.bar([i + width for i in x], avg_recalls_lr, width=width, label='Logistic Regression')
+plt.bar([i + width * 2 for i in x], avg_recalls_knn, width=width, label='KNN')
+plt.bar([i + width * 3 for i in x], avg_recalls_nb, width=width, label='Naive Bayes')
+plt.bar([i + width * 4 for i in x], avg_recalls_CL, width=width, label='SimCLR based classifier')
+
+plt.xlabel('Classifiers')
+plt.ylabel('Average Recall')
+plt.title('Average Recalls by Classifier and Training Data Size')
+plt.xticks([i + 2 * width for i in x], training_data_size_labels)
+plt.legend(loc ='lower right')
+plt.tight_layout()
+
+# Add grid lines and set background color
+plt.grid(axis='y', linestyle='-', alpha=0.7)
+plt.show()
+
